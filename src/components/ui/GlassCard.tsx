@@ -9,6 +9,7 @@ interface GlassCardProps {
   hover?: boolean;
   onClick?: () => void;
   padding?: 'sm' | 'md' | 'lg';
+  style?: React.CSSProperties;
 }
 
 export default function GlassCard({
@@ -17,6 +18,7 @@ export default function GlassCard({
   hover = false,
   onClick,
   padding = 'md',
+  style = {},
 }: GlassCardProps) {
   return (
     <motion.div
@@ -24,6 +26,7 @@ export default function GlassCard({
       style={{
         padding: padding === 'sm' ? '0.75rem' : padding === 'lg' ? '1.75rem' : '1.25rem',
         cursor: onClick ? 'pointer' : 'default',
+        ...style,
       }}
       onClick={onClick}
       whileHover={hover ? { scale: 1.02, y: -2 } : undefined}

@@ -1,244 +1,242 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import AnimatedPage from '@/components/ui/AnimatedPage';
-import GlassCard from '@/components/ui/GlassCard';
-import { Search, Users, ArrowRight, Sparkles } from 'lucide-react';
+import ClubCard from '@/components/clubs/ClubCard';
+import ClubFilters from '@/components/clubs/ClubFilters';
+import { Compass, Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import type { Club, ClubMember, MemberStatus } from '@/lib/types';
+import { useAuth } from '@/contexts/AuthContext';
 
-// Placeholder club data — Phase 2 will fetch from Supabase
-const SAMPLE_CLUBS = [
-  { id: '1', name: 'CodeCraft Club', desc: 'Competitive programming & hackathons', members: 42, tags: ['Computer Engineering', 'IT'], color: '#8b5cf6' },
-  { id: '2', name: 'Robotics Society', desc: 'Build, innovate, automate', members: 28, tags: ['Electronics', 'Mechanical'], color: '#10b981' },
-  { id: '3', name: 'Design Lab', desc: 'UI/UX, graphic design, branding', members: 35, tags: ['All Branches'], color: '#f59e0b' },
-  { id: '4', name: 'Literary Circle', desc: 'Debates, poetry, creative writing', members: 22, tags: ['All Branches'], color: '#ef4444' },
-  { id: '5', name: 'Sports Committee', desc: 'Inter-college tournaments & fitness', members: 56, tags: ['All Branches'], color: '#3b82f6' },
-  { id: '6', name: 'Eco Warriors', desc: 'Sustainability & green campus', members: 18, tags: ['Civil', 'Chemical'], color: '#06b6d4' },
+const FILTER_TAGS = [
+  'All',
+  'Computer Engineering',
+  'IT',
+  'Electronics & Communication',
+  'Mechanical Engineering',
+  'Civil Engineering',
+  'Chemical Engineering',
+  'All Branches',
 ];
 
-const ALL_TAGS = ['All', 'Computer Engineering', 'IT', 'Electronics', 'Mechanical', 'Civil', 'Chemical', 'All Branches'];
-
 export default function ExplorePage() {
+  const { user } = useAuth();
+  const [clubs, setClubs] = useState<(Club & { member_count?: number })[]>([]);
+  const [memberships, setMemberships] = useState<Record<string, MemberStatus>>({});
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [activeTag, setActiveTag] = useState('All');
+  const [selectedTag, setSelectedTag] = useState('All');
+  const [joiningClubId, setJoiningClubId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
-  const filtered = SAMPLE_CLUBS.filter((club) => {
-    const matchesSearch = club.name.toLowerCase().includes(search.toLowerCase()) ||
-      club.desc.toLowerCase().includes(search.toLowerCase());
-    const matchesTag = activeTag === 'All' || club.tags.includes(activeTag);
-    return matchesSearch && matchesTag;
-  });
+  // Fetch clubs & user memberships
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        // 1. Fetch Clubs
+        const clubRes = await fetch('/api/clubs');
+        const clubJson = await clubRes.json();
+        if (clubJson.clubs) {
+          setClubs(clubJson.clubs);
+        }
+
+        // 2. Fetch Memberships for current user
+        if (user) {
+          const memRes = await fetch('/api/memberships');
+          const memJson = await memRes.json();
+          if (memJson.memberships) {
+            const map: Record<string, MemberStatus> = {};
+            memJson.memberships.forEach((m: ClubMember) => {
+              map[m.club_id] = m.status;
+            });
+            setMemberships(map);
+          }
+        }
+      } catch (err) {
+        console.error('Error loading explore data:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [user]);
+
+  // Handle "Request to Join"
+  const handleJoinClub = async (clubId: string) => {
+    if (!user) {
+      setToastMessage({ text: 'Please sign in to join clubs.', type: 'error' });
+      return;
+    }
+
+    try {
+      setJoiningClubId(clubId);
+      const res = await fetch('/api/memberships', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ club_id: clubId }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setToastMessage({ text: data.error || 'Failed to submit join request.', type: 'error' });
+      } else {
+        setMemberships((prev) => ({ ...prev, [clubId]: 'PENDING' }));
+        setToastMessage({ text: 'Join request submitted! Waiting for club lead approval.', type: 'success' });
+      }
+    } catch {
+      setToastMessage({ text: 'Network error submitting join request.', type: 'error' });
+    } finally {
+      setJoiningClubId(null);
+      setTimeout(() => setToastMessage(null), 4000);
+    }
+  };
+
+  // Live filter & search
+  const filteredClubs = useMemo(() => {
+    return clubs.filter((c) => {
+      const q = search.toLowerCase();
+      const matchSearch =
+        c.name.toLowerCase().includes(q) ||
+        (c.description?.toLowerCase() || '').includes(q) ||
+        c.branch_tags?.some((t) => t.toLowerCase().includes(q));
+
+      const matchTag =
+        selectedTag === 'All' ||
+        c.branch_tags?.includes(selectedTag) ||
+        (selectedTag === 'All Branches' && c.branch_tags?.includes('All Branches'));
+
+      return matchSearch && matchTag;
+    });
+  }, [clubs, search, selectedTag]);
 
   return (
     <AnimatedPage>
       <div className="page-container">
-        {/* Header */}
+        {/* Header Strip */}
         <div style={{ marginBottom: '1.25rem' }}>
-          <h1 style={{
-            fontSize: '1.5rem',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-          }}>
-            Explore Clubs
-          </h1>
-          <p style={{
-            fontSize: '0.8125rem',
-            color: 'var(--color-text-secondary)',
-            marginTop: '0.25rem',
-          }}>
-            Discover and join student clubs
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+            <Compass size={22} style={{ color: 'var(--color-accent)' }} />
+            <h1
+              style={{
+                fontSize: '1.5rem',
+                fontWeight: 800,
+                letterSpacing: '-0.02em',
+                color: 'var(--color-text)',
+              }}
+            >
+              Explore Hub
+            </h1>
+          </div>
+          <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
+            Discover accredited SAC technical, cultural, and sports clubs.
           </p>
         </div>
 
-        {/* Search */}
-        <div style={{ position: 'relative', marginBottom: '1rem' }}>
-          <Search
-            size={18}
-            style={{
-              position: 'absolute',
-              left: '0.75rem',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: 'var(--color-text-muted)',
-            }}
-          />
-          <input
-            type="text"
-            className="input"
-            placeholder="Search clubs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingLeft: '2.5rem' }}
-          />
-        </div>
-
-        {/* Tag Filters */}
-        <div style={{
-          display: 'flex',
-          gap: '0.5rem',
-          overflowX: 'auto',
-          paddingBottom: '0.5rem',
-          marginBottom: '1.25rem',
-          scrollbarWidth: 'none',
-        }}>
-          {ALL_TAGS.map((tag) => (
-            <button
-              key={tag}
-              onClick={() => setActiveTag(tag)}
+        {/* Toast Alert */}
+        <AnimatePresence>
+          {toastMessage && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
               style={{
-                padding: '0.375rem 0.75rem',
-                borderRadius: 'var(--radius-pill)',
-                border: '1px solid',
-                borderColor: activeTag === tag ? 'var(--color-accent)' : 'var(--color-border)',
-                background: activeTag === tag ? 'var(--color-accent-muted)' : 'transparent',
-                color: activeTag === tag ? 'var(--color-accent)' : 'var(--color-text-secondary)',
-                fontSize: '0.75rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                padding: '0.75rem 1rem',
+                borderRadius: 'var(--radius-glass)',
+                background:
+                  toastMessage.type === 'success'
+                    ? 'rgba(16, 185, 129, 0.15)'
+                    : 'rgba(239, 68, 68, 0.15)',
+                border: `1px solid ${
+                  toastMessage.type === 'success' ? 'var(--color-success)' : 'var(--color-error)'
+                }`,
+                color:
+                  toastMessage.type === 'success' ? 'var(--color-success)' : 'var(--color-error)',
+                fontSize: '0.8125rem',
                 fontWeight: 600,
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                fontFamily: 'var(--font-sans)',
-                transition: 'all 150ms ease',
+                marginBottom: '1rem',
               }}
             >
-              {tag}
-            </button>
-          ))}
-        </div>
-
-        {/* Club Grid */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 16rem), 1fr))',
-          gap: '0.75rem',
-        }}>
-          {filtered.map((club, i) => (
-            <motion.div
-              key={club.id}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              style={{ perspective: '800px' }}
-            >
-              <GlassCard hover>
-                {/* 3D Tilt effect wrapper */}
-                <div
-                  style={{
-                    transition: 'transform 0.3s ease',
-                  }}
-                  onMouseMove={(e) => {
-                    const rect = e.currentTarget.getBoundingClientRect();
-                    const x = (e.clientX - rect.left) / rect.width - 0.5;
-                    const y = (e.clientY - rect.top) / rect.height - 0.5;
-                    e.currentTarget.style.transform = `rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'rotateY(0deg) rotateX(0deg)';
-                  }}
-                >
-                  {/* Club icon */}
-                  <div style={{
-                    width: '2.5rem',
-                    height: '2.5rem',
-                    borderRadius: '0.625rem',
-                    background: `${club.color}20`,
-                    border: `1px solid ${club.color}30`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: '0.75rem',
-                  }}>
-                    <Sparkles size={18} style={{ color: club.color }} />
-                  </div>
-
-                  <h3 style={{
-                    fontSize: '1rem',
-                    fontWeight: 700,
-                    marginBottom: '0.25rem',
-                  }}>
-                    {club.name}
-                  </h3>
-                  <p style={{
-                    fontSize: '0.8125rem',
-                    color: 'var(--color-text-secondary)',
-                    marginBottom: '0.75rem',
-                    lineHeight: 1.4,
-                  }}>
-                    {club.desc}
-                  </p>
-
-                  {/* Tags */}
-                  <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '0.375rem',
-                    marginBottom: '0.75rem',
-                  }}>
-                    {club.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        style={{
-                          padding: '0.125rem 0.5rem',
-                          borderRadius: 'var(--radius-pill)',
-                          background: 'var(--color-surface)',
-                          border: '1px solid var(--color-border)',
-                          fontSize: '0.625rem',
-                          fontWeight: 600,
-                          color: 'var(--color-text-muted)',
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                  }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.375rem',
-                      fontSize: '0.75rem',
-                      color: 'var(--color-text-muted)',
-                    }}>
-                      <Users size={14} />
-                      <span>{club.members} members</span>
-                    </div>
-                    <button
-                      className="btn btn-primary"
-                      style={{
-                        padding: '0.375rem 0.75rem',
-                        fontSize: '0.75rem',
-                        gap: '0.25rem',
-                      }}
-                    >
-                      Join
-                      <ArrowRight size={14} />
-                    </button>
-                  </div>
-                </div>
-              </GlassCard>
+              {toastMessage.type === 'success' ? (
+                <CheckCircle2 size={16} />
+              ) : (
+                <AlertCircle size={16} />
+              )}
+              <span>{toastMessage.text}</span>
             </motion.div>
-          ))}
-        </div>
+          )}
+        </AnimatePresence>
 
-        {filtered.length === 0 && (
-          <GlassCard>
-            <div style={{
-              textAlign: 'center',
-              padding: '2rem',
+        {/* Search & Tag Filter Bar */}
+        <ClubFilters
+          search={search}
+          onSearchChange={setSearch}
+          selectedTag={selectedTag}
+          onSelectTag={setSelectedTag}
+          tags={FILTER_TAGS}
+        />
+
+        {/* Loading State */}
+        {loading ? (
+          <div
+            style={{
+              padding: '3rem 0',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.75rem',
               color: 'var(--color-text-muted)',
-            }}>
-              <Search size={32} style={{ margin: '0 auto 0.75rem', opacity: 0.5 }} />
-              <p style={{ fontWeight: 600 }}>No clubs found</p>
-              <p style={{ fontSize: '0.8125rem', marginTop: '0.25rem' }}>
-                Try a different search or filter
-              </p>
-            </div>
-          </GlassCard>
+            }}
+          >
+            <Loader2 size={32} style={{ animation: 'spin 1s linear infinite', color: 'var(--color-accent)' }} />
+            <p style={{ fontSize: '0.875rem', fontWeight: 500 }}>Loading active clubs...</p>
+          </div>
+        ) : (
+          /* Responsive 3D Tilt Grid */
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 18rem), 1fr))',
+              gap: '1rem',
+            }}
+          >
+            {filteredClubs.map((club) => (
+              <ClubCard
+                key={club.id}
+                club={club}
+                membershipStatus={memberships[club.id] ?? null}
+                onJoinClick={handleJoinClub}
+                joining={joiningClubId === club.id}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty Search Result */}
+        {!loading && filteredClubs.length === 0 && (
+          <div
+            className="glass"
+            style={{
+              padding: '3rem 1.5rem',
+              textAlign: 'center',
+              borderRadius: 'var(--radius-glass)',
+              color: 'var(--color-text-muted)',
+            }}
+          >
+            <Sparkles size={36} style={{ margin: '0 auto 0.75rem', opacity: 0.4 }} />
+            <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)' }}>
+              No clubs match your criteria
+            </h3>
+            <p style={{ fontSize: '0.8125rem', marginTop: '0.25rem' }}>
+              Try searching with different keywords or reset your branch filter.
+            </p>
+          </div>
         )}
       </div>
     </AnimatedPage>
