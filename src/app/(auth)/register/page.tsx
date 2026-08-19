@@ -9,16 +9,7 @@ import {
   GraduationCap, Hash, Eye, EyeOff, Loader2, CheckCircle2
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-
-const BRANCHES = [
-  'Computer Engineering',
-  'Information Technology',
-  'Electronics & Communication',
-  'Electrical Engineering',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Chemical Engineering',
-];
+import { DIPLOMA_BRANCHES, DIPLOMA_SEMESTERS } from '@/lib/branches';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -247,8 +238,8 @@ export default function RegisterPage() {
                   style={{ paddingLeft: '2.5rem', appearance: 'none' }}
                   required
                 >
-                  <option value="">Select</option>
-                  {BRANCHES.map((b) => (
+                  <option value="">Select Branch</option>
+                  {DIPLOMA_BRANCHES.map((b) => (
                     <option key={b} value={b}>{b}</option>
                   ))}
                 </select>
@@ -266,7 +257,7 @@ export default function RegisterPage() {
                   style={{ paddingLeft: '2.5rem', appearance: 'none' }}
                   required
                 >
-                  {[1, 2, 3, 4, 5, 6, 7, 8].map((s) => (
+                  {DIPLOMA_SEMESTERS.map((s) => (
                     <option key={s} value={s}>Sem {s}</option>
                   ))}
                 </select>

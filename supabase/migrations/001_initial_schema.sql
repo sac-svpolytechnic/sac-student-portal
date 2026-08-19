@@ -17,7 +17,7 @@ CREATE TABLE profiles (
   email TEXT UNIQUE NOT NULL,
   contact_number TEXT,
   branch TEXT,
-  semester INTEGER CHECK (semester >= 1 AND semester <= 8),
+  semester INTEGER CHECK (semester >= 1 AND semester <= 6),
   roll_no TEXT UNIQUE NOT NULL,
   role user_role NOT NULL DEFAULT 'MEMBER',
   avatar_url TEXT,

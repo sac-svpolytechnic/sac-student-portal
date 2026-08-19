@@ -8,16 +8,11 @@ import ClubFilters from '@/components/clubs/ClubFilters';
 import { Compass, Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { Club, ClubMember, MemberStatus } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
+import { DIPLOMA_BRANCHES } from '@/lib/branches';
 
 const FILTER_TAGS = [
   'All',
-  'Computer Engineering',
-  'IT',
-  'Electronics & Communication',
-  'Mechanical Engineering',
-  'Civil Engineering',
-  'Chemical Engineering',
-  'All Branches',
+  ...DIPLOMA_BRANCHES,
 ];
 
 export default function ExplorePage() {
