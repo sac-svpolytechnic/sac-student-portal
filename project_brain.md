@@ -50,6 +50,9 @@ Next.js 15 (App Router, Turbopack) · React 19 · TypeScript 5 · Tailwind CSS v
 (dashboard)/super-admin/users → src/app/(dashboard)/super-admin/users/page.tsx
 (dashboard)/super-admin/audit → src/app/(dashboard)/super-admin/audit/page.tsx
 (dashboard)/profile          → src/app/(dashboard)/profile/page.tsx
+api/admin/audit              → src/app/api/admin/audit/route.ts
+api/admin/clubs              → src/app/api/admin/clubs/route.ts
+api/admin/users              → src/app/api/admin/users/route.ts
 api/clubs                    → src/app/api/clubs/route.ts
 api/memberships              → src/app/api/memberships/route.ts
 api/sessions                 → src/app/api/sessions/route.ts
