@@ -262,6 +262,32 @@ body {
   color: var(--color-text-muted);
 }
 
+select.input,
+select {
+  cursor: pointer;
+}
+
+select option {
+  background-color: #12131a;
+  color: #f8fafc;
+  padding: 0.5rem;
+}
+
+[data-theme="lumina"] select option {
+  background-color: #ffffff;
+  color: #0f172a;
+}
+
+[data-theme="emerald"] select option {
+  background-color: #0f1a1a;
+  color: #f1f5f9;
+}
+
+[data-theme="amber"] select option {
+  background-color: #1a1510;
+  color: #fffbeb;
+}
+
 /* ============================================================
    Label
    ============================================================ */
