@@ -15,49 +15,77 @@ export default function ThemeSwitcher({ variant = 'inline' }: ThemeSwitcherProps
 
   if (variant === 'inline') {
     return (
-      <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-        {themes.map((t) => (
-          <motion.button
-            key={t.id}
-            onClick={() => setTheme(t.id)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.5rem',
-              padding: '0.5rem 0.875rem',
-              borderRadius: 'var(--radius-glass)',
-              border: theme === t.id
-                ? `2px solid ${t.accent}`
-                : '2px solid var(--color-border)',
-              background: theme === t.id
-                ? `${t.accent}15`
-                : 'var(--color-surface)',
-              color: 'var(--color-text)',
-              cursor: 'pointer',
-              fontSize: '0.8125rem',
-              fontWeight: 500,
-              fontFamily: 'var(--font-sans)',
-              transition: 'all 200ms ease',
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', width: '100%', marginTop: '0.25rem' }}>
+        {themes.map((t) => {
+          const isSelected = theme === t.id;
+          const bgMap: Record<string, string> = {
+            midnight: 'linear-gradient(135deg, #0a0b10 0%, #14151f 100%)',
+            lumina: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+            emerald: 'linear-gradient(135deg, #0f1a1a 0%, #142828 100%)',
+            amber: 'linear-gradient(135deg, #1a1510 0%, #292018 100%)',
+          };
+          const textColorMap: Record<string, string> = {
+            midnight: '#f8fafc',
+            lumina: '#0f172a',
+            emerald: '#f1f5f9',
+            amber: '#fffbeb',
+          };
+
+          return (
+            <motion.button
+              key={t.id}
+              onClick={() => setTheme(t.id)}
               style={{
-                width: '1rem',
-                height: '1rem',
-                borderRadius: '50%',
-                background: t.accent,
-                border: '2px solid rgba(255,255,255,0.2)',
-                flexShrink: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'stretch',
+                padding: '1rem',
+                borderRadius: '1rem',
+                border: isSelected
+                  ? `2px solid ${t.accent}`
+                  : '2px solid var(--color-border)',
+                background: bgMap[t.id] || 'var(--color-surface)',
+                color: textColorMap[t.id] || 'var(--color-text)',
+                cursor: 'pointer',
+                textAlign: 'left',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: isSelected ? `0 8px 24px rgba(0,0,0,0.15), 0 0 16px ${t.accent}20` : 'none',
+                transition: 'border-color 200ms ease, box-shadow 200ms ease',
               }}
-            />
-            <span>{t.name}</span>
-            {theme === t.id && (
-              <Check size={14} style={{ color: t.accent }} />
-            )}
-          </motion.button>
-        ))}
+              whileHover={{ scale: 1.02, translateY: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              {/* Top info row */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                <span style={{ fontSize: '0.875rem', fontWeight: 700 }}>{t.name}</span>
+                <div
+                  style={{
+                    width: '0.875rem',
+                    height: '0.875rem',
+                    borderRadius: '50%',
+                    background: t.accent,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    boxShadow: `0 0 8px ${t.accent}50`,
+                  }}
+                >
+                  {isSelected && <Check size={8} color="#ffffff" strokeWidth={3} />}
+                </div>
+              </div>
+
+              {/* Decorative Mock Dashboard Element */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', opacity: 0.65 }}>
+                <div style={{ display: 'flex', gap: '0.25rem' }}>
+                  <div style={{ height: '6px', width: '40%', borderRadius: '3px', background: t.accent }} />
+                  <div style={{ height: '6px', width: '20%', borderRadius: '3px', background: isSelected ? 'rgba(255,255,255,0.25)' : 'rgba(128,128,128,0.25)' }} />
+                </div>
+                <div style={{ height: '6px', width: '70%', borderRadius: '3px', background: isSelected ? 'rgba(255,255,255,0.15)' : 'rgba(128,128,128,0.15)' }} />
+              </div>
+            </motion.button>
+          );
+        })}
       </div>
     );
   }

@@ -1,62 +1,10 @@
-export const SEED_CLUBS = [
-  {
-    id: 'c1111111-1111-1111-1111-111111111111',
-    name: 'CodeCraft Society',
-    description: 'Premier competitive programming, web & app development, and national hackathon collective.',
-    logo_url: null,
-    branch_tags: ['Computer Engineering', 'IT', 'AI & Data Science'],
-    status: 'ACTIVE' as const,
-    created_at: new Date(Date.now() - 90 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'c2222222-2222-2222-2222-222222222222',
-    name: 'Robotics & Automation Guild',
-    description: 'Designing autonomous rovers, combat bots, and industrial IoT micro-controllers.',
-    logo_url: null,
-    branch_tags: ['Electronics & Communication', 'Mechanical Engineering', 'Electrical Engineering'],
-    status: 'ACTIVE' as const,
-    created_at: new Date(Date.now() - 60 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'c3333333-3333-3333-3333-333333333333',
-    name: 'Design & UI/UX Collective',
-    description: 'Human-centered interaction design, 3D motion graphics, Figma prototyping, and design sprints.',
-    logo_url: null,
-    branch_tags: ['All Branches'],
-    status: 'ACTIVE' as const,
-    created_at: new Date(Date.now() - 45 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'c4444444-4444-4444-4444-444444444444',
-    name: 'Literary & Debating Society',
-    description: 'Parliamentary debates, model UN delegations, creative writing, and public oratory.',
-    logo_url: null,
-    branch_tags: ['All Branches'],
-    status: 'ACTIVE' as const,
-    created_at: new Date(Date.now() - 30 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'c5555555-5555-5555-5555-555555555555',
-    name: 'Sports & Athletics League',
-    description: 'Inter-collegiate championships, badminton, football, basketball, and fitness conditioning.',
-    logo_url: null,
-    branch_tags: ['All Branches'],
-    status: 'ACTIVE' as const,
-    created_at: new Date(Date.now() - 20 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'c6666666-6666-6666-6666-666666666666',
-    name: 'Eco-Sustainability Warriors',
-    description: 'Campus carbon-neutrality initiatives, clean renewable energy projects, and environmental audits.',
-    logo_url: null,
-    branch_tags: ['Civil Engineering', 'Chemical Engineering', 'All Branches'],
-    status: 'ACTIVE' as const,
-    created_at: new Date(Date.now() - 10 * 86400000).toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+export const SEED_CLUBS: {
+  id: string;
+  name: string;
+  description: string;
+  logo_url: string | null;
+  branch_tags: string[];
+  status: 'ACTIVE' | 'ARCHIVED';
+  created_at: string;
+  updated_at: string;
+}[] = [];

@@ -12,65 +12,16 @@ import {
 import { SEED_AUDIT_LOGS, type AuditEntry } from '@/lib/seed-admin';
 
 export default function SuperAdminPage() {
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     clubs: 6,
     users: 64,
     activeSessions: 2,
     todayCheckIns: 48,
   });
   const [recentLogs, setRecentLogs] = useState<AuditEntry[]>(SEED_AUDIT_LOGS.slice(0, 3));
-  const [liveEvents, setLiveEvents] = useState<
+  const [liveEvents] = useState<
     { id: string; user: string; roll: string; club: string; time: string; dist: number }[]
-  >([
-    {
-      id: 'e1',
-      user: 'Priya Patel',
-      roll: '2024IT204',
-      club: 'CodeCraft Society',
-      time: 'Just now',
-      dist: 12,
-    },
-    {
-      id: 'e2',
-      user: 'Rohan Verma',
-      roll: '2024EC305',
-      club: 'Robotics Guild',
-      time: '2m ago',
-      dist: 18,
-    },
-    {
-      id: 'e3',
-      user: 'Ananya Gupta',
-      roll: '2024ME412',
-      club: 'CodeCraft Society',
-      time: '5m ago',
-      dist: 8,
-    },
-  ]);
-
-  // Simulate live stream incoming checks
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const names = ['Kavita Singh', 'Devansh Joshi', 'Siddharth Roy', 'Neha Sharma'];
-      const rolls = ['2024CE501', '2024CH602', '2024CS109', '2024EE202'];
-      const clubs = ['CodeCraft Society', 'Robotics Guild', 'Design Lab'];
-
-      const randomIdx = Math.floor(Math.random() * names.length);
-      const newEvent = {
-        id: `ev-${Date.now()}`,
-        user: names[randomIdx],
-        roll: rolls[randomIdx],
-        club: clubs[randomIdx % clubs.length],
-        time: 'Just now',
-        dist: Math.floor(Math.random() * 25) + 5,
-      };
-
-      setLiveEvents((prev) => [newEvent, ...prev.slice(0, 4)]);
-      setStats((s) => ({ ...s, todayCheckIns: s.todayCheckIns + 1 }));
-    }, 12000);
-
-    return () => clearInterval(interval);
-  }, []);
+  >([]);
 
   // Fetch initial audit logs
   useEffect(() => {
@@ -263,39 +214,45 @@ export default function SuperAdminPage() {
 
           <GlassCard>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem' }}>
-              {liveEvents.map((ev) => (
-                <motion.div
-                  key={ev.id}
-                  layout
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.625rem 0.875rem',
-                    borderRadius: '0.5rem',
-                    background: 'var(--color-surface)',
-                    border: '1px solid var(--color-border)',
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
-                    <CheckCircle2 size={16} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
-                    <div>
-                      <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text)' }}>
-                        {ev.user} ({ev.roll})
-                      </p>
-                      <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
-                        {ev.club} • {ev.dist}m from GPS anchor
-                      </p>
+              {liveEvents.length > 0 ? (
+                liveEvents.map((ev) => (
+                  <motion.div
+                    key={ev.id}
+                    layout
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.625rem 0.875rem',
+                      borderRadius: '0.5rem',
+                      background: 'var(--color-surface)',
+                      border: '1px solid var(--color-border)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
+                      <CheckCircle2 size={16} style={{ color: 'var(--color-success)', flexShrink: 0 }} />
+                      <div>
+                        <p style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text)' }}>
+                          {ev.user} ({ev.roll})
+                        </p>
+                        <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
+                          {ev.club} • {ev.dist}m from GPS anchor
+                        </p>
+                      </div>
                     </div>
-                  </div>
 
-                  <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
-                    {ev.time}
-                  </span>
-                </motion.div>
-              ))}
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', fontWeight: 500 }}>
+                      {ev.time}
+                    </span>
+                  </motion.div>
+                ))
+              ) : (
+                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
+                  No live check-in events recorded today. Realtime listener active.
+                </div>
+              )}
             </div>
           </GlassCard>
         </div>

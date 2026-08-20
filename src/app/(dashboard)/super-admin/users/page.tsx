@@ -10,8 +10,10 @@ import {
 } from 'lucide-react';
 import type { Profile, UserRole } from '@/lib/types';
 import { SEED_USERS } from '@/lib/seed-admin';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function SuperAdminUsersPage() {
+  const { role: loggedInRole } = useAuth();
   const [users, setUsers] = useState<Profile[]>([]);
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | UserRole>('ALL');
@@ -138,7 +140,7 @@ export default function SuperAdminUsersPage() {
           </div>
 
           <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', scrollbarWidth: 'none' }}>
-            {(['ALL', 'SUPER_ADMIN', 'CLUB_ADMIN', 'MEMBER'] as const).map((r) => (
+            {(['ALL', 'SUPER_ADMIN', 'TEACHER', 'CLUB_ADMIN', 'MEMBER'] as const).map((r) => (
               <button
                 key={r}
                 onClick={() => setRoleFilter(r)}
@@ -180,12 +182,16 @@ export default function SuperAdminUsersPage() {
                         background:
                           user.role === 'SUPER_ADMIN'
                             ? 'var(--color-accent-muted)'
+                            : user.role === 'TEACHER'
+                            ? 'rgba(56, 189, 248, 0.15)'
                             : user.role === 'CLUB_ADMIN'
                             ? 'rgba(245, 158, 11, 0.15)'
                             : 'var(--color-surface)',
                         border: `1px solid ${
                           user.role === 'SUPER_ADMIN'
                             ? 'var(--color-accent)'
+                            : user.role === 'TEACHER'
+                            ? 'var(--color-info)'
                             : user.role === 'CLUB_ADMIN'
                             ? 'var(--color-warning)'
                             : 'var(--color-border)'
@@ -196,6 +202,8 @@ export default function SuperAdminUsersPage() {
                         color:
                           user.role === 'SUPER_ADMIN'
                             ? 'var(--color-accent)'
+                            : user.role === 'TEACHER'
+                            ? 'var(--color-info)'
                             : user.role === 'CLUB_ADMIN'
                             ? 'var(--color-warning)'
                             : 'var(--color-text-secondary)',
@@ -216,6 +224,8 @@ export default function SuperAdminUsersPage() {
                           className={`badge ${
                             user.role === 'SUPER_ADMIN'
                               ? ''
+                              : user.role === 'TEACHER'
+                              ? 'badge-success'
                               : user.role === 'CLUB_ADMIN'
                               ? 'badge-warning'
                               : 'badge-info'
@@ -241,17 +251,19 @@ export default function SuperAdminUsersPage() {
                     <select
                       className="input"
                       value={user.role}
-                      disabled={updatingId === user.id}
+                      disabled={updatingId === user.id || loggedInRole === 'TEACHER'}
                       onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
                       style={{
                         padding: '0.35rem 0.75rem',
                         fontSize: '0.75rem',
                         width: 'auto',
                         minWidth: '9rem',
+                        cursor: loggedInRole === 'TEACHER' ? 'not-allowed' : 'pointer',
                       }}
                     >
                       <option value="MEMBER">Role: MEMBER</option>
                       <option value="CLUB_ADMIN">Role: CLUB_ADMIN</option>
+                      <option value="TEACHER">Role: TEACHER</option>
                       <option value="SUPER_ADMIN">Role: SUPER_ADMIN</option>
                     </select>
                   </div>

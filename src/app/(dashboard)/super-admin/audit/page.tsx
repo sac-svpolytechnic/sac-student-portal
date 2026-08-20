@@ -6,7 +6,7 @@ import AnimatedPage from '@/components/ui/AnimatedPage';
 import GlassCard from '@/components/ui/GlassCard';
 import {
   ScrollText, Shield, ChevronDown, ChevronUp,
-  Clock, Code, Loader2
+  Clock, Code, Loader2, Download
 } from 'lucide-react';
 import type { AuditEntry } from '@/lib/seed-admin';
 import { SEED_AUDIT_LOGS } from '@/lib/seed-admin';
@@ -25,6 +25,28 @@ export default function SuperAdminAuditPage() {
   const [filter, setFilter] = useState('ALL');
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const downloadCSVReport = () => {
+    if (logs.length === 0) return;
+    const headers = ['Timestamp', 'Actor Name', 'Actor Email', 'Action Type', 'Target Name', 'Metadata'];
+    const rows = logs.map(l => [
+      new Date(l.created_at).toLocaleString(),
+      l.actor_name,
+      l.actor_email,
+      l.action,
+      l.target_name,
+      JSON.stringify(l.metadata).replace(/"/g, '""')
+    ]);
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(','), ...rows.map(e => e.map(val => `"${val}"`).join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `SAC_Audit_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   useEffect(() => {
     let isCancelled = false;
@@ -55,16 +77,27 @@ export default function SuperAdminAuditPage() {
     <AnimatedPage>
       <div className="page-container">
         {/* Header Strip */}
-        <div style={{ marginBottom: '1.25rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
-            <ScrollText size={22} style={{ color: 'var(--color-accent)' }} />
-            <h1 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
-              System Audit Logs
-            </h1>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap', marginBottom: '1.25rem' }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem' }}>
+              <ScrollText size={22} style={{ color: 'var(--color-accent)' }} />
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                System Audit Logs
+              </h1>
+            </div>
+            <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
+              Immutable chronological ledger of all administrative security and governance actions.
+            </p>
           </div>
-          <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)' }}>
-            Immutable chronological ledger of all administrative security and governance actions.
-          </p>
+          <button
+            onClick={downloadCSVReport}
+            disabled={logs.length === 0}
+            className="btn btn-ghost"
+            style={{ padding: '0.5rem 1rem', fontSize: '0.8125rem', gap: '0.375rem', border: '1px solid var(--color-border)' }}
+          >
+            <Download size={15} />
+            Export CSV
+          </button>
         </div>
 
         {/* Action Type Filter Chips */}

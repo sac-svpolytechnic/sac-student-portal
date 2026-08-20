@@ -51,7 +51,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const { user_id, role } = body;
 
-    if (!user_id || !role || !['SUPER_ADMIN', 'CLUB_ADMIN', 'MEMBER'].includes(role)) {
+    if (!user_id || !role || !['SUPER_ADMIN', 'TEACHER', 'CLUB_ADMIN', 'MEMBER'].includes(role)) {
       return NextResponse.json({ error: 'Invalid user or role' }, { status: 400 });
     }
 

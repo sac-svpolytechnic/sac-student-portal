@@ -67,11 +67,18 @@ export async function updateSession(request: NextRequest) {
 
     const role = profile?.role || 'MEMBER';
 
-    // Super Admin routes
-    if (pathname.startsWith('/super-admin') && role !== 'SUPER_ADMIN') {
-      const url = request.nextUrl.clone();
-      url.pathname = '/home';
-      return NextResponse.redirect(url);
+    // Super Admin & Teacher routes
+    if (pathname.startsWith('/super-admin')) {
+      if (role !== 'SUPER_ADMIN' && role !== 'TEACHER') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/home';
+        return NextResponse.redirect(url);
+      }
+      if (pathname.startsWith('/super-admin/clubs') && role === 'TEACHER') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/super-admin';
+        return NextResponse.redirect(url);
+      }
     }
 
     // Club Admin routes

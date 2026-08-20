@@ -4,7 +4,7 @@
 Next.js 15 (App Router, Turbopack) · React 19 · TypeScript 5 · Tailwind CSS v4 · Framer Motion · Lucide Icons · Supabase (Postgres + Auth + RLS + Realtime) · Jose · QRCode
 
 ## DB Schema Snapshot
-- `profiles`: `id` (FK auth.users), `name`, `email`, `contact_number`, `branch`, `semester` (1-8), `roll_no` (UQ), `role` (`user_role`), `avatar_url`, `created_at`, `updated_at`
+- `profiles`: `id` (FK auth.users), `name`, `email`, `contact_number`, `branch`, `semester` (1-6), `roll_no` (UQ), `role` (`user_role`), `avatar_url`, `created_at`, `updated_at`
 - `clubs`: `id` (PK), `name` (UQ), `description`, `logo_url`, `branch_tags` (TEXT[]), `status` (`club_status`), `created_by` (FK profiles), `created_at`, `updated_at`
 - `club_members`: `id` (PK), `club_id` (FK), `user_id` (FK), `role` (`club_role`), `status` (`member_status`), `joined_at`, `created_at` — UQ(`club_id`, `user_id`)
 - `sessions`: `id` (PK), `club_id` (FK), `title`, `description`, `start_time`, `end_time`, `lat`, `lng`, `geofence_radius_m` (DEF 100), `qr_secret`, `status` (`session_status`), `created_by` (FK), `created_at`
@@ -12,21 +12,26 @@ Next.js 15 (App Router, Turbopack) · React 19 · TypeScript 5 · Tailwind CSS v
 - `audit_logs`: `id` (PK), `actor_id` (FK profiles), `action`, `target_type`, `target_id`, `metadata` (JSONB), `created_at`
 
 ## Enums
-`user_role`: `SUPER_ADMIN` | `CLUB_ADMIN` | `MEMBER`
+`user_role`: `SUPER_ADMIN` | `TEACHER` | `CLUB_ADMIN` | `MEMBER`
 `club_status`: `ACTIVE` | `ARCHIVED`
 `member_status`: `PENDING` | `ACCEPTED` | `REJECTED`
 `club_role`: `LEAD` | `CO_LEAD` | `MEMBER`
 `session_status`: `SCHEDULED` | `ACTIVE` | `ENDED`
 
+## SVPC Diploma Curriculum & Accounts
+- **Branches (12)**: `Information Technology (IT)`, `Computer Science (CS)`, `Civil Engineering`, `Mechanical Engineering`, `Electrical Engineering`, `Electronics Engineering`, `Production Engineering`, `FTTP`, `Pharmacy`, `MOM`, `Architecture`, `Other Diploma Branch`
+- **Semesters (6)**: 1, 2, 3, 4, 5, 6
+- **Super Admin Account**: `Vaibhav Vishwakarma` (`vaibhavvishwakarma0322@gmail.com` / Roll: `2024CS101`)
+
 ## Role Hierarchy & Access Matrix
-| Resource | MEMBER | CLUB_ADMIN | SUPER_ADMIN |
-|---|---|---|---|
-| View Clubs / Profiles | ✅ Self / Active | ✅ All | ✅ All |
-| Request Club Join | ✅ | ✅ | ✅ |
-| Manage Club Members / Requests | ❌ | ✅ Own Club | ✅ All Clubs |
-| Create / Broadcast Sessions | ❌ | ✅ Own Club | ✅ All Clubs |
-| Mark Attendance (QR + Geofence) | ✅ | ✅ | ✅ |
-| Audit Logs / Global Governance | ❌ | ❌ | ✅ |
+| Resource | MEMBER | CLUB_ADMIN | TEACHER | SUPER_ADMIN |
+|---|---|---|---|---|
+| View Clubs / Profiles | ✅ Self / Active | ✅ All | ✅ All | ✅ All |
+| Request Club Join / Scan QR | ✅ | ✅ | ❌ | ✅ |
+| Manage Club Members / Requests | ❌ | ✅ Own Club | ❌ | ✅ All Clubs |
+| Create / Broadcast Sessions | ❌ | ✅ Own Club | ❌ | ✅ All Clubs |
+| System Auditing & CSV Download | ❌ | ❌ | ✅ (View-Only) | ✅ (Full control) |
+| Global Governance (User Registry) | ❌ | ❌ | ✅ (View-Only) | ✅ (Full control) |
 
 ## Theming Matrix (4 Presets)
 - `midnight` (Default): Obsidian `#0a0b10` + Neon Violet `#8b5cf6` (Glassmorphic)
@@ -34,7 +39,7 @@ Next.js 15 (App Router, Turbopack) · React 19 · TypeScript 5 · Tailwind CSS v
 - `emerald`: Deep Forest Slate `#0f1a1a` + Mint Jade `#10b981` (Dark Glass)
 - `amber`: Warm Charcoal `#1a1510` + Sunset Amber `#f59e0b` (Dark Warm Glass)
 
-## Active Routes
+## Active Routes (24 Total)
 ```
 (auth)/login                 → src/app/(auth)/login/page.tsx
 (auth)/register              → src/app/(auth)/register/page.tsx
@@ -65,7 +70,7 @@ api/attendance/check-out     → src/app/api/attendance/check-out/route.ts
 ```
 BottomNav → NavItem (per tab, role-filtered with spring physics)
 GlassCard (reusable glassmorphism surface with optional style/hover)
-ThemeSwitcher (inline & dropdown variants)
+ThemeSwitcher (grid card select layout with interactive mock dashboard previews)
 AnimatedPage (Framer Motion page transition wrapper)
 ClubCard (3D tilt, CSS transforms, ambient radial glow, status badges)
 ClubFilters (search + animated branch filter chips)

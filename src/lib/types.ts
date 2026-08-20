@@ -2,7 +2,7 @@
 // SAC Student Portal — Shared Types
 // ============================================================
 
-export type UserRole = 'SUPER_ADMIN' | 'CLUB_ADMIN' | 'MEMBER';
+export type UserRole = 'SUPER_ADMIN' | 'TEACHER' | 'CLUB_ADMIN' | 'MEMBER';
 export type ClubStatus = 'ACTIVE' | 'ARCHIVED';
 export type MemberStatus = 'PENDING' | 'ACCEPTED' | 'REJECTED';
 export type ClubRole = 'LEAD' | 'CO_LEAD' | 'MEMBER';

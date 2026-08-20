@@ -47,13 +47,13 @@ const TABS: Tab[] = [
     icon: <Settings size={22} />,
     roles: ['CLUB_ADMIN'],
   },
-  // SUPER_ADMIN tabs
+  // SUPER_ADMIN & TEACHER tabs
   {
     id: 'super-console',
     label: 'Console',
     href: '/super-admin',
     icon: <Shield size={22} />,
-    roles: ['SUPER_ADMIN'],
+    roles: ['SUPER_ADMIN', 'TEACHER'],
   },
   {
     id: 'super-clubs',
@@ -67,14 +67,14 @@ const TABS: Tab[] = [
     label: 'Users',
     href: '/super-admin/users',
     icon: <Users size={22} />,
-    roles: ['SUPER_ADMIN'],
+    roles: ['SUPER_ADMIN', 'TEACHER'],
   },
   {
     id: 'super-audit',
     label: 'Audit',
     href: '/super-admin/audit',
     icon: <ScrollText size={22} />,
-    roles: ['SUPER_ADMIN'],
+    roles: ['SUPER_ADMIN', 'TEACHER'],
   },
   // Shared
   {
@@ -82,7 +82,7 @@ const TABS: Tab[] = [
     label: 'Profile',
     href: '/profile',
     icon: <User size={22} />,
-    roles: ['MEMBER', 'CLUB_ADMIN', 'SUPER_ADMIN'],
+    roles: ['MEMBER', 'CLUB_ADMIN', 'SUPER_ADMIN', 'TEACHER'],
   },
 ];
 
