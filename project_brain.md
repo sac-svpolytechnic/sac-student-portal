@@ -4,7 +4,7 @@
 Next.js 15 (App Router, Turbopack) · React 19 · TypeScript 5 · Tailwind CSS v4 · Framer Motion · Lucide Icons · Supabase (Postgres + Auth + RLS + Realtime) · Jose · QRCode
 
 ## DB Schema Snapshot
-- `profiles`: `id` (FK auth.users), `name`, `email`, `contact_number`, `branch`, `semester` (1-6), `roll_no` (UQ), `role` (`user_role`), `avatar_url`, `created_at`, `updated_at`
+- `profiles`: `id` (FK auth.users), `name`, `email`, `contact_number`, `branch`, `semester` (1-6), `roll_no` (UQ), `role` (`user_role`), `roles` (TEXT[]), `avatar_url`, `created_at`, `updated_at`
 - `clubs`: `id` (PK), `name` (UQ), `description`, `logo_url`, `branch_tags` (TEXT[]), `status` (`club_status`), `created_by` (FK profiles), `created_at`, `updated_at`
 - `club_members`: `id` (PK), `club_id` (FK), `user_id` (FK), `role` (`club_role`), `status` (`member_status`), `joined_at`, `created_at` — UQ(`club_id`, `user_id`)
 - `sessions`: `id` (PK), `club_id` (FK), `title`, `description`, `start_time`, `end_time`, `lat`, `lng`, `geofence_radius_m` (DEF 100), `qr_secret`, `status` (`session_status`), `created_by` (FK), `created_at`

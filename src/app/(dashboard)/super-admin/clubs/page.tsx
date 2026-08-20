@@ -111,8 +111,9 @@ export default function SuperAdminClubsPage() {
   });
 
   return (
-    <AnimatedPage>
-      <div className="page-container">
+    <>
+      <AnimatedPage>
+        <div className="page-container">
         {/* Header Strip */}
         <div
           style={{
@@ -279,88 +280,89 @@ export default function SuperAdminClubsPage() {
             ))}
           </div>
         )}
-
-        {/* Modal for Creating New Club */}
-        <AnimatePresence>
-          {showModal && (
-            <div
-              style={{
-                position: 'fixed',
-                inset: 0,
-                background: 'rgba(0,0,0,0.7)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                overflowY: 'auto',
-                zIndex: 50,
-                padding: '2rem 1rem',
-              }}
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="glass"
-                style={{
-                  width: '100%',
-                  maxWidth: '30rem',
-                  padding: '1.5rem',
-                  borderRadius: '1.25rem',
-                  boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-                  flexShrink: 0,
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>Register New Club</h3>
-                  <button onClick={() => setShowModal(false)} className="btn btn-ghost" style={{ padding: '0.25rem' }}>
-                    <X size={18} />
-                  </button>
-                </div>
-
-                <form onSubmit={handleCreateClub} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  <div>
-                    <label className="label" htmlFor="club-name">Club Name</label>
-                    <input
-                      id="club-name"
-                      type="text"
-                      className="input"
-                      placeholder="e.g. AI & Machine Learning Guild"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="label" htmlFor="club-desc">Description</label>
-                    <textarea
-                      id="club-desc"
-                      className="input"
-                      rows={3}
-                      placeholder="Mission statement, activities, and goals..."
-                      value={description}
-                      onChange={(e) => setDescription(e.target.value)}
-                      style={{ resize: 'none' }}
-                      required
-                    />
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-                    <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost">
-                      Cancel
-                    </button>
-                    <button type="submit" disabled={creating} className="btn btn-primary">
-                      {creating ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : 'Register Club'}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
       </div>
     </AnimatedPage>
+
+    {/* Modal for Creating New Club — Placed outside AnimatedPage to prevent transform clipping */}
+    <AnimatePresence>
+      {showModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(8px)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'flex-start',
+            overflowY: 'auto',
+            zIndex: 9999,
+            padding: '2rem 1rem',
+          }}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="glass"
+            style={{
+              width: '100%',
+              maxWidth: '30rem',
+              padding: '1.5rem',
+              borderRadius: '1.25rem',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+              <h3 style={{ fontSize: '1.125rem', fontWeight: 800 }}>Register New Club</h3>
+              <button onClick={() => setShowModal(false)} className="btn btn-ghost" style={{ padding: '0.25rem' }}>
+                <X size={18} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateClub} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label className="label" htmlFor="club-name">Club Name</label>
+                <input
+                  id="club-name"
+                  type="text"
+                  className="input"
+                  placeholder="e.g. AI & Machine Learning Guild"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="label" htmlFor="club-desc">Description</label>
+                <textarea
+                  id="club-desc"
+                  className="input"
+                  rows={3}
+                  placeholder="Mission statement, activities, and goals..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  style={{ resize: 'none' }}
+                  required
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+                <button type="button" onClick={() => setShowModal(false)} className="btn btn-ghost">
+                  Cancel
+                </button>
+                <button type="submit" disabled={creating} className="btn btn-primary">
+                  {creating ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : 'Register Club'}
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+    </>
   );
 }
