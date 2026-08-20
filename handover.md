@@ -1,7 +1,7 @@
 # SAC Student Portal — Handover Document
 
-> **Last Updated:** 2026-08-20T02:13Z
-> **Current Phase:** All Phases Fully Built, Optimized & Verified ✅
+> **Last Updated:** 2026-08-20T07:18Z
+> **Current Phase:** Production Optimized & Verified ✅
 
 ## Implementation State
 
@@ -36,9 +36,9 @@
 - **Phase 4: Super Admin & Teacher Console, Audit Logs & Live Stream**
   - **TEACHER Role**: Observer account role that can see global KPI statistics, search students, inspect audit security logs, and export reports, but is restricted from editing roles, managing clubs, or joining organizations.
   - **CSV Report Exporter**: Fully client-side spreadsheet compilation & download for system audit trails (`/super-admin/audit`).
-  - **Multiple Role Support**: Users with a global `SUPER_ADMIN` system permission can also hold club-specific roles (e.g. `LEAD` or `CO_LEAD` inside specific clubs) to manage club rosters and attendance sheets.
+  - **Multiple Role Support**: Users with a global `SUPER_ADMIN` system permission can also hold club-specific roles (e.g. `LEAD` or `CO_LEAD` inside specific clubs) to manage club rosters.
   - Super Admin Dashboard (`/super-admin`): Global KPI cards, live attendance feed (cleared of dummy data and waiting for live WebSocket/Realtime check-ins), and recent security logs.
-  - Global Clubs Management (`/super-admin/clubs`): Register new club modal, status toggle (`ACTIVE` / `ARCHIVED`), and branch tag management.
+  - Global Clubs Management (`/super-admin/clubs`): Register new club modal with screen-reach overflow scrolling, static "All Students Eligible" tags, and branch constraints removed.
   - Student & User Registry (`/super-admin/users`): Real-time search across names, emails, roll numbers, and branches; role filter chips; dynamic role elevation (`MEMBER` <-> `CLUB_ADMIN` <-> `TEACHER` <-> `SUPER_ADMIN`).
   - Audit Trail Timeline (`/super-admin/audit`): Filterable timeline of all administrative security and governance actions with expandable JSON metadata inspector.
   - Super Admin APIs: `/api/admin/clubs`, `/api/admin/users`, and `/api/admin/audit`.
