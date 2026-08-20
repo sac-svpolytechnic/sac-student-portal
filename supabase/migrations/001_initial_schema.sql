@@ -3,6 +3,21 @@
 -- Run this in Supabase SQL Editor or via supabase db push
 -- ============================================================
 
+-- 0. Clean up existing database objects if they exist to allow clean re-runs
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+DROP FUNCTION IF EXISTS public.handle_new_user CASCADE;
+DROP TABLE IF EXISTS attendance CASCADE;
+DROP TABLE IF EXISTS sessions CASCADE;
+DROP TABLE IF EXISTS club_members CASCADE;
+DROP TABLE IF EXISTS clubs CASCADE;
+DROP TABLE IF EXISTS profiles CASCADE;
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TYPE IF EXISTS user_role CASCADE;
+DROP TYPE IF EXISTS club_status CASCADE;
+DROP TYPE IF EXISTS member_status CASCADE;
+DROP TYPE IF EXISTS club_role CASCADE;
+DROP TYPE IF EXISTS session_status CASCADE;
+
 -- 1. Custom Enums
 CREATE TYPE user_role AS ENUM ('SUPER_ADMIN', 'TEACHER', 'CLUB_ADMIN', 'MEMBER');
 CREATE TYPE club_status AS ENUM ('ACTIVE', 'ARCHIVED');
