@@ -134,12 +134,10 @@ CREATE POLICY "Users can insert own profile"
 -- Clubs
 ALTER TABLE clubs ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Anyone can view active clubs"
+CREATE POLICY "Anyone can view all clubs"
   ON clubs FOR SELECT
   TO authenticated
-  USING (status = 'ACTIVE' OR EXISTS (
-    SELECT 1 FROM profiles WHERE id = auth.uid() AND role = 'SUPER_ADMIN'
-  ));
+  USING (true);
 
 CREATE POLICY "Super admins can insert clubs"
   ON clubs FOR INSERT

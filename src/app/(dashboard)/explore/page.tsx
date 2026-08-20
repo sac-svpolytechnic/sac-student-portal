@@ -8,12 +8,6 @@ import ClubFilters from '@/components/clubs/ClubFilters';
 import { Compass, Sparkles, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { Club, ClubMember, MemberStatus } from '@/lib/types';
 import { useAuth } from '@/contexts/AuthContext';
-import { DIPLOMA_BRANCHES } from '@/lib/branches';
-
-const FILTER_TAGS = [
-  'All',
-  ...DIPLOMA_BRANCHES,
-];
 
 export default function ExplorePage() {
   const { user } = useAuth();
@@ -21,7 +15,6 @@ export default function ExplorePage() {
   const [memberships, setMemberships] = useState<Record<string, MemberStatus>>({});
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [selectedTag, setSelectedTag] = useState('All');
   const [joiningClubId, setJoiningClubId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -93,19 +86,13 @@ export default function ExplorePage() {
   const filteredClubs = useMemo(() => {
     return clubs.filter((c) => {
       const q = search.toLowerCase();
-      const matchSearch =
+      return (
         c.name.toLowerCase().includes(q) ||
         (c.description?.toLowerCase() || '').includes(q) ||
-        c.branch_tags?.some((t) => t.toLowerCase().includes(q));
-
-      const matchTag =
-        selectedTag === 'All' ||
-        c.branch_tags?.includes(selectedTag) ||
-        (selectedTag === 'All Branches' && c.branch_tags?.includes('All Branches'));
-
-      return matchSearch && matchTag;
+        c.branch_tags?.some((t) => t.toLowerCase().includes(q))
+      );
     });
-  }, [clubs, search, selectedTag]);
+  }, [clubs, search]);
 
   return (
     <AnimatedPage>
@@ -167,13 +154,10 @@ export default function ExplorePage() {
           )}
         </AnimatePresence>
 
-        {/* Search & Tag Filter Bar */}
+        {/* Search Bar */}
         <ClubFilters
           search={search}
           onSearchChange={setSearch}
-          selectedTag={selectedTag}
-          onSelectTag={setSelectedTag}
-          tags={FILTER_TAGS}
         />
 
         {/* Loading State */}
@@ -229,7 +213,7 @@ export default function ExplorePage() {
               No clubs match your criteria
             </h3>
             <p style={{ fontSize: '0.8125rem', marginTop: '0.25rem' }}>
-              Try searching with different keywords or reset your branch filter.
+              Try searching with different keywords.
             </p>
           </div>
         )}

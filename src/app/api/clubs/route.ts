@@ -8,7 +8,6 @@ export async function GET() {
     const { data: clubs, error } = await supabase
       .from('clubs')
       .select('*, club_members(count)')
-      .eq('status', 'ACTIVE')
       .order('created_at', { ascending: false });
 
     if (error || !clubs || clubs.length === 0) {

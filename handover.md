@@ -1,6 +1,6 @@
 # SAC Student Portal — Handover Document
 
-> **Last Updated:** 2026-08-20T14:43Z
+> **Last Updated:** 2026-08-20T14:46Z
 > **Current Phase:** Production Optimized & Verified ✅
 
 ## Implementation State
@@ -11,9 +11,9 @@
   - `handover.md` (Live tracking of implementation state, blockers, and next steps).
 - **Phase 1: Foundation (Auth, PWA, Theming)**
   - Next.js 15 App Router scaffolded with TypeScript 5, Tailwind CSS v4, Lucide Icons, Framer Motion.
-  - PWA installability fully configured (standalone manifest settings, high-res cyber crest icons `/icon-192.jpg`/`/icon-512.jpg`, `sw.js` caching registered inside `RootLayout`).
+  - PWA installability fully configured (standalone manifest settings, icons `/icon-192.jpg`/`/icon-512.jpg`, service worker).
   - Supabase PostgreSQL schema with custom ENUMs, 6 core tables, roles text array, RLS policies, trigger for automatic profile synchronization on auth.signup, and Realtime publications.
-  - Client and Server Supabase integration + Next.js middleware RBAC protection.
+  - Client and Server Supabase integration + Next.js middleware RBAC protection (cookie options parsed to prevent duplicate cookies, and role DB lookups optimized to run *only* on admin pages to prevent DB pool exhaustion).
   - 4-Theme Engine in `src/app/globals.css` with `@theme` (Midnight Cyber, Clean Lumina, Emerald Forest, Sunset Amber).
   - `ThemeContext` (flash-free, localStorage persistence) + `ThemeSwitcher` (visual card grid layout with interactive previews).
   - `AuthContext` supporting login via `roll_no` OR `email` + `password`, role resolution, automatic post-registration login, and full metadata sync.
