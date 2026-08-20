@@ -13,7 +13,7 @@ import { DIPLOMA_BRANCHES, DIPLOMA_SEMESTERS } from '@/lib/branches';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signUp, signIn } = useAuth();
 
   const [form, setForm] = useState({
     name: '',
@@ -66,8 +66,10 @@ export default function RegisterPage() {
       setError(result.error);
       setLoading(false);
     } else {
+      // Automatically log in the user
+      await signIn({ email: form.email, password: form.password });
       setSuccess(true);
-      setTimeout(() => router.push('/login'), 2000);
+      setTimeout(() => router.push('/home'), 2000);
     }
   };
 

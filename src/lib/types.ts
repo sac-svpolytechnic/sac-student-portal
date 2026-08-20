@@ -18,6 +18,7 @@ export interface Profile {
   semester: number | null;
   roll_no: string;
   role: UserRole;
+  roles?: UserRole[];
   avatar_url: string | null;
   created_at: string;
   updated_at: string;

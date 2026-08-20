@@ -290,10 +290,12 @@ export default function SuperAdminClubsPage() {
                 background: 'rgba(0,0,0,0.7)',
                 backdropFilter: 'blur(8px)',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
+                overflowY: 'auto',
                 zIndex: 50,
-                padding: '1rem',
+                padding: '2rem 1rem',
               }}
             >
               <motion.div
@@ -307,8 +309,7 @@ export default function SuperAdminClubsPage() {
                   padding: '1.5rem',
                   borderRadius: '1.25rem',
                   boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
-                  maxHeight: '90vh',
-                  overflowY: 'auto',
+                  flexShrink: 0,
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>

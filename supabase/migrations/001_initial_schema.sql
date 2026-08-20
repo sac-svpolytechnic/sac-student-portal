@@ -4,7 +4,7 @@
 -- ============================================================
 
 -- 1. Custom Enums
-CREATE TYPE user_role AS ENUM ('SUPER_ADMIN', 'CLUB_ADMIN', 'MEMBER');
+CREATE TYPE user_role AS ENUM ('SUPER_ADMIN', 'TEACHER', 'CLUB_ADMIN', 'MEMBER');
 CREATE TYPE club_status AS ENUM ('ACTIVE', 'ARCHIVED');
 CREATE TYPE member_status AS ENUM ('PENDING', 'ACCEPTED', 'REJECTED');
 CREATE TYPE club_role AS ENUM ('LEAD', 'CO_LEAD', 'MEMBER');
@@ -20,6 +20,7 @@ CREATE TABLE profiles (
   semester INTEGER CHECK (semester >= 1 AND semester <= 6),
   roll_no TEXT UNIQUE NOT NULL,
   role user_role NOT NULL DEFAULT 'MEMBER',
+  roles TEXT[] DEFAULT '{MEMBER}',
   avatar_url TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -297,7 +298,7 @@ CREATE POLICY "Authenticated users can insert audit logs"
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO public.profiles (id, name, email, roll_no, contact_number, branch, semester, role)
+  INSERT INTO public.profiles (id, name, email, roll_no, contact_number, branch, semester, role, roles)
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'name', ''),
@@ -306,7 +307,8 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'contact_number', ''),
     COALESCE(NEW.raw_user_meta_data->>'branch', ''),
     COALESCE((NEW.raw_user_meta_data->>'semester')::INTEGER, 1),
-    'MEMBER'
+    'MEMBER',
+    ARRAY['MEMBER']
   );
   RETURN NEW;
 END;

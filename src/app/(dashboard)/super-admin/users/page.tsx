@@ -46,27 +46,27 @@ export default function SuperAdminUsersPage() {
     };
   }, [roleFilter, search]);
 
-  const handleRoleChange = async (userId: string, newRole: UserRole) => {
+  const handleUpdateRoles = async (userId: string, targetRoles: UserRole[]) => {
     try {
       setUpdatingId(userId);
       const res = await fetch('/api/admin/users', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, role: newRole }),
+        body: JSON.stringify({ user_id: userId, roles: targetRoles }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
         setUsers((prev) =>
-          prev.map((u) => (u.id === userId ? { ...u, role: newRole } : u))
+          prev.map((u) => (u.id === userId ? { ...u, role: data.user.role, roles: data.user.roles } : u))
         );
-        setToast({ text: `Role elevated to ${newRole} successfully!`, type: 'success' });
+        setToast({ text: `User roles updated successfully!`, type: 'success' });
       } else {
-        setToast({ text: data.error || 'Failed to update role', type: 'error' });
+        setToast({ text: data.error || 'Failed to update roles', type: 'error' });
       }
     } catch {
-      setToast({ text: 'Network error updating user role.', type: 'error' });
+      setToast({ text: 'Network error updating user roles.', type: 'error' });
     } finally {
       setUpdatingId(null);
       setTimeout(() => setToast(null), 3500);
@@ -220,21 +220,49 @@ export default function SuperAdminUsersPage() {
                         <h3 style={{ fontSize: '0.9375rem', fontWeight: 700, color: 'var(--color-text)' }}>
                           {user.name}
                         </h3>
-                        <span
-                          className={`badge ${
-                            user.role === 'SUPER_ADMIN'
-                              ? ''
-                              : user.role === 'TEACHER'
-                              ? 'badge-success'
-                              : user.role === 'CLUB_ADMIN'
-                              ? 'badge-warning'
-                              : 'badge-info'
-                          }`}
-                          style={{ fontSize: '0.625rem' }}
-                        >
-                          <Shield size={10} />
-                          {user.role}
-                        </span>
+                        {/* Display active roles as badges */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginTop: '0.25rem' }}>
+                          {(user.roles && user.roles.length > 0 ? user.roles : [user.role]).map((r) => (
+                            <span
+                              key={r}
+                              className={`badge ${
+                                r === 'SUPER_ADMIN'
+                                  ? ''
+                                  : r === 'TEACHER'
+                                  ? 'badge-success'
+                                  : r === 'CLUB_ADMIN'
+                                  ? 'badge-warning'
+                                  : 'badge-info'
+                              }`}
+                              style={{ fontSize: '0.625rem', gap: '0.25rem', paddingRight: (user.roles && user.roles.length > 1 && loggedInRole !== 'TEACHER') ? '0.25rem' : '0.5rem' }}
+                            >
+                              <Shield size={10} />
+                              {r}
+                              {user.roles && user.roles.length > 1 && loggedInRole !== 'TEACHER' && (
+                                <button
+                                  onClick={() => {
+                                    const nextRoles = user.roles!.filter((val) => val !== r);
+                                    handleUpdateRoles(user.id, nextRoles);
+                                  }}
+                                  style={{
+                                    border: 'none',
+                                    background: 'transparent',
+                                    color: 'currentColor',
+                                    cursor: 'pointer',
+                                    padding: '0 0.125rem',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    fontSize: '0.75rem',
+                                    fontWeight: 700,
+                                  }}
+                                  title={`Remove ${r} role`}
+                                >
+                                  ×
+                                </button>
+                              )}
+                            </span>
+                          ))}
+                        </div>
                       </div>
 
                       <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '0.125rem' }}>
@@ -246,26 +274,48 @@ export default function SuperAdminUsersPage() {
                     </div>
                   </div>
 
-                  {/* Role Elevation Selector */}
+                  {/* Add Role Selector */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <select
-                      className="input"
-                      value={user.role}
-                      disabled={updatingId === user.id || loggedInRole === 'TEACHER'}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value as UserRole)}
-                      style={{
-                        padding: '0.35rem 0.75rem',
-                        fontSize: '0.75rem',
-                        width: 'auto',
-                        minWidth: '9rem',
-                        cursor: loggedInRole === 'TEACHER' ? 'not-allowed' : 'pointer',
-                      }}
-                    >
-                      <option value="MEMBER">Role: MEMBER</option>
-                      <option value="CLUB_ADMIN">Role: CLUB_ADMIN</option>
-                      <option value="TEACHER">Role: TEACHER</option>
-                      <option value="SUPER_ADMIN">Role: SUPER_ADMIN</option>
-                    </select>
+                    {loggedInRole !== 'TEACHER' && (
+                      (() => {
+                        const active = user.roles && user.roles.length > 0 ? user.roles : [user.role];
+                        const available = (['SUPER_ADMIN', 'TEACHER', 'CLUB_ADMIN', 'MEMBER'] as UserRole[]).filter(
+                          (r) => !active.includes(r)
+                        );
+
+                        if (available.length === 0) return null;
+
+                        return (
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                            <select
+                              className="input"
+                              defaultValue=""
+                              disabled={updatingId === user.id}
+                              onChange={(e) => {
+                                if (e.target.value) {
+                                  const nextRoles = [...active, e.target.value as UserRole];
+                                  handleUpdateRoles(user.id, nextRoles);
+                                  e.target.value = ""; // reset selection
+                                }
+                              }}
+                              style={{
+                                padding: '0.35rem 0.75rem',
+                                fontSize: '0.75rem',
+                                width: 'auto',
+                                minWidth: '8.5rem',
+                              }}
+                            >
+                              <option value="" disabled>+ Add Role</option>
+                              {available.map((r) => (
+                                <option key={r} value={r}>
+                                  {r}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        );
+                      })()
+                    )}
                   </div>
                 </div>
               </GlassCard>
