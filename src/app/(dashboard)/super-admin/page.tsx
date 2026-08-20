@@ -9,33 +9,58 @@ import {
   Shield, Compass, Users, ScrollText, TrendingUp,
   Activity, ArrowRight, CheckCircle2,
 } from 'lucide-react';
-import { SEED_AUDIT_LOGS, type AuditEntry } from '@/lib/seed-admin';
+import { type AuditEntry } from '@/lib/seed-admin';
 
 export default function SuperAdminPage() {
-  const [stats] = useState({
-    clubs: 6,
-    users: 64,
-    activeSessions: 2,
-    todayCheckIns: 48,
+  const [stats, setStats] = useState({
+    clubs: 0,
+    users: 0,
+    activeSessions: 0,
+    todayCheckIns: 0,
   });
-  const [recentLogs, setRecentLogs] = useState<AuditEntry[]>(SEED_AUDIT_LOGS.slice(0, 3));
+  const [recentLogs, setRecentLogs] = useState<AuditEntry[]>([]);
   const [liveEvents] = useState<
     { id: string; user: string; roll: string; club: string; time: string; dist: number }[]
   >([]);
 
-  // Fetch initial audit logs
+  // Fetch initial audit logs & dynamic dashboard stats
   useEffect(() => {
     let isCancelled = false;
 
     async function loadData() {
       try {
+        // Fetch Audit Logs
         const res = await fetch('/api/admin/audit');
         const data = await res.json();
         if (!isCancelled && data.logs) {
           setRecentLogs(data.logs.slice(0, 3));
         }
+
+        // Fetch Clubs Count
+        const clubsRes = await fetch('/api/admin/clubs');
+        const clubsData = await clubsRes.json();
+        const clubsCount = clubsData.clubs?.length || 0;
+
+        // Fetch Users Count
+        const usersRes = await fetch('/api/admin/users');
+        const usersData = await usersRes.json();
+        const usersCount = usersData.users?.length || 0;
+
+        // Fetch Sessions Count
+        const sessionsRes = await fetch('/api/sessions');
+        const sessionsData = await sessionsRes.json();
+        const sessionsCount = sessionsData.sessions?.length || 0;
+
+        if (!isCancelled) {
+          setStats({
+            clubs: clubsCount,
+            users: usersCount,
+            activeSessions: sessionsCount,
+            todayCheckIns: 0, // Clean start
+          });
+        }
       } catch (err) {
-        console.error('Audit fetch error:', err);
+        console.error('Stats loading error:', err);
       }
     }
     loadData();
@@ -270,36 +295,42 @@ export default function SuperAdminPage() {
 
           <GlassCard>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              {recentLogs.map((log) => (
-                <div
-                  key={log.id}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    padding: '0.625rem 0',
-                    borderBottom: '1px solid var(--color-border)',
-                  }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                      <span className="badge" style={{ fontSize: '0.5625rem', padding: '0.1rem 0.35rem' }}>
-                        {log.action}
-                      </span>
-                      <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text)' }}>
-                        {log.target_name}
-                      </span>
+              {recentLogs.length > 0 ? (
+                recentLogs.map((log) => (
+                  <div
+                    key={log.id}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.625rem 0',
+                      borderBottom: '1px solid var(--color-border)',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                        <span className="badge" style={{ fontSize: '0.5625rem', padding: '0.1rem 0.35rem' }}>
+                          {log.action}
+                        </span>
+                        <span style={{ fontSize: '0.8125rem', fontWeight: 600, color: 'var(--color-text)' }}>
+                          {log.target_name}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>
+                        By {log.actor_name}
+                      </p>
                     </div>
-                    <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>
-                      By {log.actor_name}
-                    </p>
-                  </div>
 
-                  <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
-                    {new Date(log.created_at).toLocaleDateString()}
-                  </span>
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>
+                      {new Date(log.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <div style={{ padding: '2rem 1rem', textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.8125rem' }}>
+                  No security or governance actions recorded yet.
                 </div>
-              ))}
+              )}
             </div>
           </GlassCard>
         </div>

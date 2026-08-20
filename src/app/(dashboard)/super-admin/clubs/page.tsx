@@ -21,7 +21,6 @@ export default function SuperAdminClubsPage() {
   // Form State
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [tagsInput, setTagsInput] = useState('Computer Engineering, IT');
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
@@ -55,7 +54,7 @@ export default function SuperAdminClubsPage() {
 
     try {
       setCreating(true);
-      const branch_tags = tagsInput.split(',').map((t) => t.trim()).filter(Boolean);
+      const branch_tags = ['All Students'];
 
       const res = await fetch('/api/admin/clubs', {
         method: 'POST',
@@ -243,21 +242,18 @@ export default function SuperAdminClubsPage() {
 
                       {/* Branch Tags */}
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginTop: '0.5rem' }}>
-                        {club.branch_tags?.map((t) => (
-                          <span
-                            key={t}
-                            style={{
-                              padding: '0.15rem 0.45rem',
-                              borderRadius: 'var(--radius-pill)',
-                              background: 'var(--color-surface)',
-                              border: '1px solid var(--color-border)',
-                              fontSize: '0.625rem',
-                              color: 'var(--color-text-muted)',
-                            }}
-                          >
-                            {t}
-                          </span>
-                        ))}
+                        <span
+                          style={{
+                            padding: '0.15rem 0.45rem',
+                            borderRadius: 'var(--radius-pill)',
+                            background: 'var(--color-surface)',
+                            border: '1px solid var(--color-border)',
+                            fontSize: '0.625rem',
+                            color: 'var(--color-text-muted)',
+                          }}
+                        >
+                          All Students Eligible
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -311,6 +307,8 @@ export default function SuperAdminClubsPage() {
                   padding: '1.5rem',
                   borderRadius: '1.25rem',
                   boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
+                  maxHeight: '90vh',
+                  overflowY: 'auto',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
@@ -345,18 +343,6 @@ export default function SuperAdminClubsPage() {
                       onChange={(e) => setDescription(e.target.value)}
                       style={{ resize: 'none' }}
                       required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="label" htmlFor="club-tags">Eligible Branch Tags (comma separated)</label>
-                    <input
-                      id="club-tags"
-                      type="text"
-                      className="input"
-                      placeholder="Computer Engineering, IT, All Branches"
-                      value={tagsInput}
-                      onChange={(e) => setTagsInput(e.target.value)}
                     />
                   </div>
 
