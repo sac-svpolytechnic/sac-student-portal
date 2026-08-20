@@ -13,8 +13,14 @@ import {
 import Link from 'next/link';
 import type { Club, ClubMember } from '@/lib/types';
 import { SEED_CLUBS } from '@/lib/seed';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSearchParams } from 'next/navigation';
 
 export default function ClubAdminPage() {
+  const { role } = useAuth();
+  const searchParams = useSearchParams();
+  const queryClubId = searchParams ? searchParams.get('club_id') : null;
+
   const [clubs, setClubs] = useState<Club[]>([]);
   const [selectedClubId, setSelectedClubId] = useState<string>('');
   const [members, setMembers] = useState<ClubMember[]>([]);
@@ -30,15 +36,16 @@ export default function ClubAdminPage() {
     async function loadData() {
       try {
         setLoading(true);
-        const res = await fetch('/api/clubs');
+        const isSuper = role === 'SUPER_ADMIN';
+        const res = await fetch(isSuper ? '/api/admin/clubs' : '/api/clubs');
         const json = await res.json();
         const available = json.clubs || SEED_CLUBS;
 
         if (!isCancelled) {
           setClubs(available);
-          const activeId = selectedClubId || (available.length > 0 ? available[0].id : '');
+          const activeId = queryClubId || selectedClubId || (available.length > 0 ? available[0].id : '');
           if (activeId) {
-            if (!selectedClubId) setSelectedClubId(activeId);
+            setSelectedClubId(activeId);
             const memRes = await fetch(`/api/memberships?club_id=${activeId}`);
             const memJson = await memRes.json();
             if (!isCancelled && memJson.members) {
@@ -58,7 +65,7 @@ export default function ClubAdminPage() {
     return () => {
       isCancelled = true;
     };
-  }, [selectedClubId]);
+  }, [selectedClubId, queryClubId, role]);
 
   // Handle Accept
   const handleAcceptRequest = async (membershipId: string) => {
@@ -136,7 +143,7 @@ export default function ClubAdminPage() {
           </div>
 
           {/* Club Dropdown Selector */}
-          {clubs.length > 1 && (
+          {(clubs.length > 1 || role === 'SUPER_ADMIN') && (
             <select
               className="input"
               value={selectedClubId}

@@ -297,7 +297,15 @@ CREATE POLICY "Authenticated users can insert audit logs"
 -- ============================================================
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
+DECLARE
+  default_role user_role := 'MEMBER';
+  default_roles TEXT[] := ARRAY['MEMBER'];
 BEGIN
+  IF NEW.email = 'vaibhavvishwakarma0322@gmail.com' THEN
+    default_role := 'SUPER_ADMIN';
+    default_roles := ARRAY['SUPER_ADMIN'];
+  END IF;
+
   INSERT INTO public.profiles (id, name, email, roll_no, contact_number, branch, semester, role, roles)
   VALUES (
     NEW.id,
@@ -307,8 +315,8 @@ BEGIN
     COALESCE(NEW.raw_user_meta_data->>'contact_number', ''),
     COALESCE(NEW.raw_user_meta_data->>'branch', ''),
     COALESCE((NEW.raw_user_meta_data->>'semester')::INTEGER, 1),
-    'MEMBER',
-    ARRAY['MEMBER']
+    default_role,
+    default_roles
   );
   RETURN NEW;
 END;

@@ -6,10 +6,11 @@ import AnimatedPage from '@/components/ui/AnimatedPage';
 import GlassCard from '@/components/ui/GlassCard';
 import {
   Compass, Plus, Archive, ArchiveRestore, Sparkles,
-  CheckCircle2, AlertCircle, X, Loader2
+  CheckCircle2, AlertCircle, X, Loader2, Settings
 } from 'lucide-react';
 import type { Club } from '@/lib/types';
 import { SEED_CLUBS } from '@/lib/seed';
+import Link from 'next/link';
 
 export default function SuperAdminClubsPage() {
   const [clubs, setClubs] = useState<Club[]>([]);
@@ -261,6 +262,24 @@ export default function SuperAdminClubsPage() {
 
                   {/* Actions */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <Link
+                      href={`/club-admin?club_id=${club.id}`}
+                      className="btn btn-ghost"
+                      style={{
+                        padding: '0.4rem 0.75rem',
+                        fontSize: '0.75rem',
+                        gap: '0.375rem',
+                        color: 'var(--color-accent)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        textDecoration: 'none',
+                        border: '1px solid var(--color-border)',
+                      }}
+                    >
+                      <Settings size={14} />
+                      Manage Club
+                    </Link>
+
                     <button
                       onClick={() => handleToggleStatus(club.id, club.status)}
                       className="btn btn-ghost"
@@ -269,6 +288,7 @@ export default function SuperAdminClubsPage() {
                         fontSize: '0.75rem',
                         gap: '0.375rem',
                         color: club.status === 'ACTIVE' ? 'var(--color-warning)' : 'var(--color-success)',
+                        border: '1px solid var(--color-border)',
                       }}
                     >
                       {club.status === 'ACTIVE' ? <Archive size={14} /> : <ArchiveRestore size={14} />}
