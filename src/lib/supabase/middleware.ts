@@ -18,14 +18,14 @@ export async function updateSession(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+          cookiesToSet.forEach(({ name, value, options }) =>
+            request.cookies.set({ name, value, ...options })
           );
           supabaseResponse = NextResponse.next({
             request,
           });
-          cookiesToSet.forEach(({ name, value }) =>
-            supabaseResponse.cookies.set(name, value)
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set({ name, value, ...options })
           );
         },
       },
@@ -57,8 +57,10 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Role-based route protection
-  if (user) {
+  // Role-based route protection — Only query DB if user is accessing restricted admin dashboards
+  const needsRoleCheck = pathname.startsWith('/super-admin') || pathname.startsWith('/club-admin');
+
+  if (user && needsRoleCheck) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')

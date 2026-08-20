@@ -1,6 +1,6 @@
 # SAC Student Portal — Handover Document
 
-> **Last Updated:** 2026-08-20T08:29Z
+> **Last Updated:** 2026-08-20T14:43Z
 > **Current Phase:** Production Optimized & Verified ✅
 
 ## Implementation State
@@ -35,8 +35,9 @@
   - **TEACHER Role**: Observer account role that can see global KPI statistics, search students, inspect audit security logs, and export reports view-only.
   - **CSV Report Exporter**: Fully client-side spreadsheet compilation & download for system audit trails (`/super-admin/audit`).
   - **Multiple Role Support**: Users can hold multiple global roles at the same time (displayed as badges in User Registry, e.g. `SUPER_ADMIN, CLUB_ADMIN`). Assigning/revoking roles is managed via a clean "+ Add Role" drop-list select and `x` badge triggers, with automatic priority resolution to keep RLS active.
+  - **Super Admin Club management access**: Added a "Manage Club" link next to each club on `/super-admin/clubs` dashboard that routes directly to `/club-admin?club_id={clubId}` so that Super Admins can manage requests, rosters, and sessions for any club in the system.
   - Super Admin Dashboard (`/super-admin`): Dynamic stats metrics counts, live attendance feed waiting for check-ins, and recent audit logs.
-  - Global Clubs Management (`/super-admin/clubs`): Top-aligned register club modal with overflow scrolling to prevent cutoff, branch restrictions removed, and static tags.
+  - Global Clubs Management (`/super-admin/clubs`): Top-aligned register club modal with screen-reach overflow scrolling, branch restrictions removed, and static tags.
   - Student & User Registry (`/super-admin/users`): Real-time search, role filter chips, and multi-role checklist configuration.
   - Zero TypeScript, build, or ESLint errors (24/24 routes statically/dynamically compiled with `npm run build` and `npm run lint` passing 100%).
 
